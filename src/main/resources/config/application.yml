@@ -1,0 +1,7 @@
+server:
+  port: 9200
+spring:
+  application:
+    name: hive-help
+  profiles:
+    active: local
