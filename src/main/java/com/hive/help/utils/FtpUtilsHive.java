@@ -1,10 +1,8 @@
 package com.hive.help.utils;
 
+import com.hive.help.utils.mysql.HiveHelpMysql;
 import com.jcraft.jsch.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -90,14 +88,13 @@ public class FtpUtilsHive {
     }
   }
 
-  private static String path = "/opt/merges/";
+  private static String path = "/var/lib/mysql-files/";
   public static String client = "client/";
   public static String credit = "credit/";
   public static String service = "service/";
 
   private static String FILE_NAME = "scorpio.8050.1.DATE.log";
 
-  public static String START_DATE = "20231006";
   public static String format_YYYY_MM_DD(Date date) {
     return new SimpleDateFormat("yyyyMMdd").format(date);
   }
@@ -106,12 +103,12 @@ public class FtpUtilsHive {
    * 根据起始日期获取所有文件名称
    * @return
    */
-  public static ArrayList<String> getAllFileNames(){
+  public static ArrayList<String> getAllFileNames(Class[] hiveClasses){
     ArrayList<String> names = new ArrayList<>();
     Date nowDate = new Date();
     Date startData = null;
     try {
-      startData = new SimpleDateFormat("yyyyMMdd").parse(START_DATE);
+      startData = new SimpleDateFormat("yyyyMMdd").parse(FtpUtilsDownload.START_DATE);
     } catch (ParseException e) {
       throw new RuntimeException(e);
     }
@@ -120,7 +117,7 @@ public class FtpUtilsHive {
       String fileName = FILE_NAME.replace("DATE",startDataStr);
       //非今日数据处理
       if(!format_YYYY_MM_DD(startData).equals(format_YYYY_MM_DD(nowDate))){
-        for(Class hiveClass: HiveHelp.allHiveClass) {
+        for(Class hiveClass: hiveClasses) {
           String className = hiveClass.getSimpleName().toLowerCase();
           names.add(className+"_"+fileName);
         }
@@ -140,14 +137,21 @@ public class FtpUtilsHive {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    ArrayList<String> fileNames = FtpUtilsHive.getAllFileNames();
+
+    download(FtpUtilsHive.getAllFileNames(HiveHelpMysql.allClientHiveClass),path+client);
+    //download(FtpUtilsHive.getAllFileNames(HiveHelpMysql.allCreditHiveClass),path+credit);
+    //download(FtpUtilsHive.getAllFileNames(HiveHelpMysql.allScoprioHiveClass),path+service);
+
+    close();
+  }
+
+  private static void download(ArrayList<String> fileNames,String path){
     for(String fileName:fileNames){
       //下载文件
-      downloadFile(path+client,fileName);
-      downloadFile(path+credit,fileName);
-      downloadFile(path+service,fileName);
+      if(fileName.startsWith("app")){
+        downloadFile(path,fileName);
+      }
     }
-    close();
   }
 
   /**
@@ -172,7 +176,7 @@ public class FtpUtilsHive {
     }
   }
 
-  static HiveHelp hiveHelp = new HiveHelp();
+  static HiveHelpMysql hiveHelp = new HiveHelpMysql();
 
   /**
    * 获取远程文件大小

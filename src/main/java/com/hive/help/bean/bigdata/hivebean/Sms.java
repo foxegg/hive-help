@@ -14,7 +14,6 @@ import java.util.List;
  */
 @Data
 public class Sms {
-
     public String deriveNo;
     public String district;
     public String dataId;

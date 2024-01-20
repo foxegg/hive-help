@@ -23,6 +23,7 @@ public enum DateType {
     FKN001("FKN-001", new ArrayList<String>()),
     FKN002("FKN-002", new ArrayList<String>()),
     FKN003("FKN-003", new ArrayList<String>()),
+    RISKSMS002("RISKSMS-002", new ArrayList<String>()),
     ;
 
 

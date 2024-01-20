@@ -15,7 +15,6 @@ import java.util.List;
  */
 @Data
 public class App {
-
     public String deriveNo;
     public String district;
     public String dataId;
@@ -33,6 +32,6 @@ public class App {
     public boolean systemApp;
     public String versionName;
     public long versionCode;
-    public Date firstInstallTime;
-    public Date lastUpdateTime;
+    public long firstInstallTime;
+    public long lastUpdateTime;
 }

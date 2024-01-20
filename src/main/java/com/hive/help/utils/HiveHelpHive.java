@@ -1,31 +1,30 @@
 package com.hive.help.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * JDBC 操作 Hive
  *
  */
 @Slf4j
-public class HiveHelp {
-
-	private static String driverName = "org.apache.hive.jdbc.HiveDriver";
-	private static String url = "jdbc:hive2://192.168.3.3:10000/hive_data";// hive_data 是数据库名称
-	private static String user = "root";// hadoop中可以訪問hdfs的用戶
-	private static String password = "root";// 該用戶的密碼
+public class HiveHelpHive {
+	private static String driverName = "com.mysql.cj.jdbc.Driver";
+	private static String url = "jdbc:mysql://192.168.3.3:3306/risk?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true";
+	private static String username = "root";
+	private static String password = "root123";
 
 	private static Connection conn = null;
 	private static Statement stmt = null;
 	private static ResultSet rs = null;
 
 	public static void main(String[] args){
-		HiveHelp hiveHelp = new HiveHelp();
+		HiveHelpHive hiveHelp = new HiveHelpHive();
 		try {
 			hiveHelp.init();
 			hiveHelp.deopTables();
@@ -58,7 +57,7 @@ public class HiveHelp {
 
 	public void init() throws Exception {
 		Class.forName(driverName);
-		conn = DriverManager.getConnection(url, user, password);
+		conn = DriverManager.getConnection(url, username, password);
 		stmt = conn.createStatement();
 	}
 
@@ -112,7 +111,28 @@ public class HiveHelp {
 			com.hive.help.bean.bigdata.hivebean.FKN001.class,
 			com.hive.help.bean.bigdata.hivebean.FKN002.class,
 			com.hive.help.bean.bigdata.hivebean.FKN003.class,
+			com.hive.help.bean.bigdata.hivebean.RiskSms002.class,
 	};
+	public static Class[] allClientHiveClass = {
+			com.hive.help.bean.bigdata.hivebean.Device.class,
+			com.hive.help.bean.bigdata.hivebean.Location.class,
+			com.hive.help.bean.bigdata.hivebean.App.class,
+			com.hive.help.bean.bigdata.hivebean.Contact.class,
+			com.hive.help.bean.bigdata.hivebean.Sms.class,
+	};
+	public static Class[] allCreditHiveClass = {
+			com.hive.help.bean.bigdata.hivebean.Idcardpics.class,
+			com.hive.help.bean.bigdata.hivebean.CreditContacts.class,
+			com.hive.help.bean.bigdata.hivebean.BaseInfo.class,
+			com.hive.help.bean.bigdata.hivebean.ExtraInfo.class,
+	};
+	public static Class[] allScoprioHiveClass = {
+			com.hive.help.bean.bigdata.hivebean.FKN001.class,
+			com.hive.help.bean.bigdata.hivebean.FKN002.class,
+			com.hive.help.bean.bigdata.hivebean.FKN003.class,
+			com.hive.help.bean.bigdata.hivebean.RiskSms002.class,
+	};
+
 	public void getCreateTableSql(){
 		for(Class hiveClass: allHiveClass){
 			StringBuilder sb = new StringBuilder();
@@ -122,7 +142,7 @@ public class HiveHelp {
 			for(Field field:fields){
 				String type = field.getType().getSimpleName().toLowerCase();
 				if(type.equals("long")){
-					type = "bigint";
+					type = "int";
 				}
 				sb.append(field.getName() + " " + type+",");
 			}
@@ -237,7 +257,9 @@ public class HiveHelp {
 			Field[] fields = classData.getDeclaredFields();
 			for(Field field:fields){
 				if(field.get(obj)!=null){
-					sb.append(field.get(obj).toString().replaceAll("\\r?\\n", " ") .replaceAll(",","")+",");
+					sb.append(field.get(obj).toString().replaceAll("\\r?\\n", " ")
+							.replaceAll("'", "\\\\'")
+							.replaceAll(",", "\\\\,")+",");
 				}else{
 					sb.append(",");
 				}

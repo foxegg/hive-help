@@ -7,7 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@EnableMethodCache(basePackages = "com.zhongqijia.pay")//项目主路径
+@EnableMethodCache(basePackages = "com.hive.help")//项目主路径
 @EnableCreateCacheAnnotation
 @Slf4j
 public class DigitalStoragePayApplication {

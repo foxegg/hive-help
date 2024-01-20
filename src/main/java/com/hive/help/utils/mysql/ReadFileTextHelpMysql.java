@@ -1,10 +1,10 @@
-package com.hive.help.utils;
+package com.hive.help.utils.mysql;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hive.help.bean.bigdata.databean.*;
 import com.hive.help.bean.bigdata.hivebean.*;
 import com.hive.help.common.enums.DateType;
-import com.hive.help.utils.mysql.HiveHelpMysql;
+import com.hive.help.utils.FtpUtilsDownload;
 import org.springframework.beans.BeanUtils;
 
 import java.io.*;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ReadFileTextHelp {
+public class ReadFileTextHelpMysql {
     /**
      * 读取整个文件
      * @param fileName
@@ -23,9 +23,13 @@ public class ReadFileTextHelp {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
-                initText(line);
+                try{
+                    initText(line);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
-        } catch (IOException | ParseException e) {
+        } catch (IOException e) {
             //e.printStackTrace();
         }
     }
@@ -42,9 +46,7 @@ public class ReadFileTextHelp {
         ArrayList<String> fileNames = FtpUtilsDownload.getAllFileNames();
         for(String fileName:fileNames){
             System.out.println("读取文件开始:"+fileName);
-            nowName = fileName.replace(".log","");//.sql
-            nowName = nowName.substring(0,nowName.length()-1)+".sql";
-
+            nowName = fileName;
             nowPath = FtpUtilsDownload.destFilePath+ FtpUtilsDownload.client;
             readFile(FtpUtilsDownload.destFilePath+ FtpUtilsDownload.client+fileName);
             //文件读完遍历插入数据
@@ -53,7 +55,7 @@ public class ReadFileTextHelp {
                     endAndInsert(value.getData());
                 }
             }
-            /*nowPath = FtpUtilsDownload.destFilePath+ FtpUtilsDownload.credit;
+            nowPath = FtpUtilsDownload.destFilePath+ FtpUtilsDownload.credit;
             readFile(FtpUtilsDownload.destFilePath+ FtpUtilsDownload.credit+fileName);
             //文件读完遍历插入数据
             for (DateType value : DateType.values()) {
@@ -69,7 +71,7 @@ public class ReadFileTextHelp {
                 if(value.getData().size()>0){
                     endAndInsert(value.getData());
                 }
-            }*/
+            }
             System.out.println("读取文件结束:"+fileName);
         }
         typeCount.forEach((k,v)->{
@@ -102,7 +104,8 @@ public class ReadFileTextHelp {
      * @param dataList
      */
     private static void checkAndInsert(List dataList){
-        if(dataList.size()>=20000){
+        //-Xms1024m -Xmx1024m -XX:PermSize=256M -XX:MaxNewSize=512m -XX:MaxPermSize=512m
+        if(dataList.size()>=100000){
             try {
                 //hiveHelp.insertData(dataList);
                 outFile(hiveHelp.insertData(dataList),dataList);
@@ -160,9 +163,6 @@ public class ReadFileTextHelp {
     public static void initText(String text) throws ParseException {
         JSONObject json = (JSONObject)JSONObject.parse(text);
         String dataId = json.getString("dataId");
-        if(dataId.equals(DateType.APP.getCode())){
-           return;
-        }
         //设备上报
         if (dataId.equals(DateType.LOCATION.getCode())) {//已保存
             LocationLog locationLog = JSONObject.parseObject(text, LocationLog.class);
