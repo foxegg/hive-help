@@ -1,15 +1,27 @@
 package com.hive.help.utils.mysql;
 
 public class Test {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         StringBuilder sbTmp = new StringBuilder();
-        sbTmp.append("09994038317 09209514187 09491138312 09214358729 09475576706 09235006005 09302128603 09151880467 09476018201 09454772584 09153472033 +639173055379 09485155381 09129968482 09307045158 09088645272 09161732889 09213332207 09129225126 +639460212402 09214491173 +639914939084 09996700236 09278580441 09929504791 09091478041 09459678137 09197550553 +639171646403 09061095970 09059151467 09914939084 +639483226193 09690508180 09319104474 09061747683 09494290923");
-        if(sbTmp.length()>64){
-            sbTmp.delete(64,sbTmp.length());
+        sbTmp.append("You don\u0027t have enough balance to complete your payment of P299.00 to Google. Use GCredit or Cash-In to increase your balance and try again.,"
+                .replaceAll("\\\\", "")
+                .replaceAll("[\r|\n]", " ")
+                .replaceAll(",", " "));
+        if (sbTmp.length() > 512) {
+            sbTmp.delete(512, sbTmp.length());
         }
-        while(sbTmp.lastIndexOf("\\",sbTmp.length())>-1){
-            sbTmp.delete(sbTmp.length()-1,sbTmp.length());
-        }
-        System.out.println(sbTmp);
+        System.out.println(changeMsg(sbTmp.toString()));
+    }
+
+    private static String changeMsg(String msg) {
+        msg = msg.replaceAll("\\u000a", "\n");
+        msg = msg.replaceAll("\\u0009", "\t");
+        msg = msg.replaceAll("\\u0008", "\b");
+        msg = msg.replaceAll("\\u000d", "\r");
+        msg = msg.replaceAll("\\u000c", "\f");
+        msg = msg.replaceAll("\\u0027", "'");
+        msg = msg.replaceAll("\\u0022", "\"");
+        msg = msg.replaceAll("\\u005c", "\\");
+        return msg;
     }
 }

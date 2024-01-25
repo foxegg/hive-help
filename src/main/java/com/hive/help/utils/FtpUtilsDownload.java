@@ -98,7 +98,7 @@ public class FtpUtilsDownload {
   public static String destFilePath = "D:/logs/";
   private static String FILE_NAME = "scorpio.8050.1.DATE.log";
 
-  public static String START_DATE = "20240115";
+  public static String START_DATE = "20240124";
   public static String format_YYYY_MM_DD(Date date) {
     return new SimpleDateFormat("yyyyMMdd").format(date);
   }

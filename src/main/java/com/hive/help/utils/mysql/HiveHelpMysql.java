@@ -295,15 +295,11 @@ public class HiveHelpMysql {
 
                         sbTmp.delete(0, sbTmp.length());
                         sbTmp.append(field.get(obj).toString()
-                                .replaceAll("\\\\", "")
                                 .replaceAll("[\r|\n]", " ")
-                                .replaceAll("'", "\\\\'")
-                                .replaceAll(",", "\\\\,"));
+                                .replaceAll("\\\\", "")
+                                .replaceAll(",", " "));
                         if (sbTmp.length() > length) {
                             sbTmp.delete(length, sbTmp.length());
-                        }
-                        while (sbTmp.lastIndexOf("\\", sbTmp.length()) > -1) {
-                            sbTmp.delete(sbTmp.length() - 1, sbTmp.length());
                         }
                         sb.append(sbTmp).append(",");
                     }
